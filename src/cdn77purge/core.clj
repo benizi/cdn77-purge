@@ -58,7 +58,7 @@
     (clojure.string/replace url "://www2." "://www.")
     url))
 
-
+(comment
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; identify stale files by using last-modified
 ;;; we could have used etag too, but that is not supported by CDN77
@@ -80,8 +80,15 @@
   "return true of both CDN and origin has the same contents"
   (let [origin-last-modified (get-last-modified-origin url)
         cdn-last-modified (get-last-modified-cdn url)]
-    (not= origin-last-modified cdn-last-modified)))
+    (= origin-last-modified cdn-last-modified)))
 
+)
+
+(defn same-contents? [url]
+  "Check same contents by downloading page"
+  (let [origin-contents (:body @(http/get (make-origin url)))
+        cdn-contents (:body @(http/get (make-cdn url)))]
+    (= origin-contents cdn-contents)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
@@ -111,7 +118,7 @@
   ;;([] (first-time-updates (take 50 (get-sitemap))))
   ([] (first-time-updates (get-sitemap)))
 
-  ([sitemap] (filter same-contents? sitemap))
+  ([sitemap] (filter #(not (same-contents? %)) sitemap))
   )
 
 (def batch-size 5)
