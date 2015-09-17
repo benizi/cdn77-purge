@@ -80,16 +80,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
 
+(defn remove-backslash-slash [url]
+  (clojure.string/replace url "\\/" "/"))
+
 (defn get-sitemap []
   "Get the complete sitemap, parse it, and returns of the urls only"
   (let [sitemap-url (str (:origin Cdn77) "/sitemap.xml")
         sitemap-page (http/get sitemap-url)
         body (:body @sitemap-page)
         ;; xml/parse parse a file or stream, therefor the getBytes. Let us hope we do not run into UTF-8 problems
-        sitemap (:content (xml/parse (java.io.ByteArrayInputStream. (.getBytes body))))
+        sitemap (:content (xml/parse (java.io.ByteArrayInputStream. (.getBytes body "UTF-8"))))
         ]
     ;;; #clojure.data.xml.Element{:tag :url, :attrs {}, :content (#clojure.data.xml.Element{:tag :loc, :attrs {}, :content ("http://www.spreadsheetconverter.com/")} #clojure.data.xml.Element{:tag :lastmod, :attrs {}, :content ("2015-09-11T12:52:19+00:00")} #clojure.data.xml.Element{:tag :changefreq, :attrs {}, :content ("daily")} #clojure.data.xml.Element{:tag :priority, :attrs {}, :content ("1.0")})}
-    (map (fn [x] (first (:content (first (:content x))))) sitemap)
+    (map (fn [x] (remove-backslash-slash (first (:content (first (:content x)))))) sitemap)
   )
 )
 
@@ -99,7 +102,8 @@
 ;;; from origin and compare, and then force a refresh of cdn
 (defn first-time-updates 
   "find all urls whose are not the same in origin and cdn"
-  ([] (first-time-updates (take 10 (get-sitemap))))
+  ;;([] (first-time-updates (take 50 (get-sitemap))))
+  ([] (first-time-updates (nthrest (get-sitemap) 50)))
 
   ([sitemap] 
    (filter
@@ -113,6 +117,4 @@
 
 (defn force-refresh []
   (let [stale-urls (first-time-updates)]
-    (doseq [url stale-urls] 
-      (cdn77purge.cdn77/request-prefetch url))
-    (cdn77purge.cdn77/go)))
+    (cdn77purge.cdn77/cdn77-prefetch stale-urls)))

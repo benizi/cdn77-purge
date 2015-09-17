@@ -15,15 +15,17 @@
 
 (defn cdn77-prefetch [urls]
   (let [config cdn77purge.core/Cdn77
-        site (:origin config)
+        site (:cdn config)              ;the one without the www2
         no-site-urls (map #(clojure.string/replace % site "") urls)
         options {:form-params {:cdn_id (:cdn_id config)
                                :login (:login config)
                                :passwd (:passwd config)
                                ;; todo: need to handle more urls
-                               "url[]" (first no-site-urls)}}
+                               "url[]" no-site-urls}}
         res @(http/post "https://api.cdn77.com/v2.0/data/prefetch" options)
         {:keys [status error]} res]
+    (info site)
+    (info no-site-urls)
     (if error
       (error "Failed, exception is " error res)
       (info "Async HTTP POST: " status res))))
