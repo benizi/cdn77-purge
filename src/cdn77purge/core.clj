@@ -76,6 +76,12 @@
         modified (-> @headers :headers :last-modified)]
     (list url modified)))
 
+(defn same-contents? [url]
+  "return true of both CDN and origin has the same contents"
+  (let [origin-last-modified (get-last-modified-origin url)
+        cdn-last-modified (get-last-modified-cdn url)]
+    (not= origin-last-modified cdn-last-modified)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
@@ -103,18 +109,20 @@
 (defn first-time-updates 
   "find all urls whose are not the same in origin and cdn"
   ;;([] (first-time-updates (take 50 (get-sitemap))))
-  ([] (first-time-updates (nthrest (get-sitemap) 50)))
+  ([] (first-time-updates (get-sitemap)))
 
-  ([sitemap] 
-   (filter
-    (fn [url]
-      (let [origin-last-modified (get-last-modified-origin url)
-            cdn-last-modified (get-last-modified-cdn url)]
-        (not= origin-last-modified cdn-last-modified)))
-    sitemap
-    ))
+  ([sitemap] (filter same-contents? sitemap))
   )
 
-(defn force-refresh []
-  (let [stale-urls (first-time-updates)]
-    (cdn77purge.cdn77/cdn77-prefetch stale-urls)))
+(def batch-size 5)
+
+(defn force-refresh 
+  "Ask cdn77 to refresh all urls. In order not to make the POST too big, the
+  number of urls per request is limited to batch-size"
+  ([] (force-refresh (first-time-updates)))
+
+  ([stale-urls]
+   (let [first (take batch-size stale-urls)
+         rest (nthrest stale-urls batch-size)]
+     (cdn77purge.cdn77/cdn77-prefetch first)
+     (recur rest))))
