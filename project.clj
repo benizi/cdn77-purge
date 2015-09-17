@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [http-kit "2.1.18"]
                  [org.clojure/data.xml "0.0.8"]
+                 [org.clojure/tools.logging "0.2.3"]
                  ]
   :main ^:skip-aot cdn77purge.core
   :target-path "target/%s"
