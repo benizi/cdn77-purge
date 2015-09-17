@@ -37,6 +37,46 @@
   (let [state (read-string (slurp "state.txt"))]
     (reset! State state)))
 
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; In my case, switching between origin and master url is
+;;; very simple
+
+(defn make-origin [url] 
+  "Make sure www is replaced by www2, unless we already have it"
+  (if (.contains url "://www.")
+    (clojure.string/replace url "://www." "://www2.")
+    url))
+
+(defn make-cdn [url] 
+  "Make sure www2 is replaced by www, unless we already have it"
+  (if (.contains url "://www2.")
+    (clojure.string/replace url "://www2." "://www.")
+    url))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; identify stale files by using last-modified
+;;; we could have used etag too, but that is not supported by CDN77
+;;; (20150917)
+
+(defn get-last-modified-origin [url]
+  "Get the date from the origin"
+  (let [headers (http/head (make-origin url))
+        modified (-> @headers :headers :last-modified)]
+    (list url modified)))
+
+(defn get-last-modified-cdn [url]
+  "Get the date from the origin"
+  (let [headers (http/head (make-cdn url))
+        modified (-> @headers :headers :last-modified)]
+    (list url modified)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
 
@@ -52,3 +92,27 @@
     (map (fn [x] (first (:content (first (:content x))))) sitemap)
   )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; first time, when do not have a state, we need to download all
+;;; files from both origin and cdn. Once we have a state, we only download
+;;; from origin and compare, and then force a refresh of cdn
+(defn first-time-updates 
+  "find all urls whose are not the same in origin and cdn"
+  ([] (first-time-updates (take 10 (get-sitemap))))
+
+  ([sitemap] 
+   (filter
+    (fn [url]
+      (let [origin-last-modified (get-last-modified-origin url)
+            cdn-last-modified (get-last-modified-cdn url)]
+        (not= origin-last-modified cdn-last-modified)))
+    sitemap
+    ))
+  )
+
+(defn force-refresh []
+  (let [stale-urls (first-time-updates)]
+    (doseq [url stale-urls] 
+      (cdn77purge.cdn77/request-prefetch url))
+    (cdn77purge.cdn77/go)))
