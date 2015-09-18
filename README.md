@@ -1,11 +1,3 @@
-# NOT WORKING
-
-This is not working currently, since CDN77 prefetch-api cannot handle a url like /about-us/ as a page. It assumes it is a directory. I am waiting for a fix.
-
-There are other issues I hope CDN77 will fix
- * forward the etag
- * forward the last-modified
-so I do not have to compare page by contents, and just can do all this by using HEAD instead of GET.
 
 # cdn77purge
 
@@ -48,9 +40,17 @@ FIXME: listing of options this app accepts.
 
 ...
 
+### Improvements
+
+There are other issues I hope CDN77 will fix
+ * forward the etag
+ * forward the last-modified
+so I do not have to compare page by contents, and just can do all this by using HEAD instead of GET.
+
 ### Bugs
 
 ...
+
 
 ### Any Other Sections
 ### That You Think
