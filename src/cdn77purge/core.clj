@@ -2,8 +2,12 @@
   (:require [org.httpkit.client :as http]
   	    [clojure.data.xml :as xml]
 	    [clojure.java.io :as io]
+            [cdn77purge.cdn77 :as cdn77]
             )
+  (:gen-class)
   )
+
+
 
 (def Cdn77
   "The parameters used to identify your CDN77 account
@@ -131,5 +135,5 @@
   ([stale-urls]
    (let [first (take batch-size stale-urls)
          rest (nthrest stale-urls batch-size)]
-     (cdn77purge.cdn77/cdn77-prefetch first)
+     (cdn77purge.cdn77/cdn77-prefetch first Cdn77)
      (recur rest))))

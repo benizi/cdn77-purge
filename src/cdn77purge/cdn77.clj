@@ -1,5 +1,7 @@
 (ns cdn77purge.cdn77
-  (:require [org.httpkit.client :as http]))
+  (:require [org.httpkit.client :as http])
+  (:gen-class)
+  )
 
 (use 'clojure.tools.logging)
 
@@ -13,9 +15,8 @@
   (info (str "request-prefetch: " url))
   (swap! Todo (fn [todo] (conj todo (list :prefetch url)))))
 
-(defn cdn77-prefetch [urls]
-  (let [config cdn77purge.core/Cdn77
-        site (:cdn config)              ;the one without the www2
+(defn cdn77-prefetch [urls config]
+  (let [site (:cdn config)              ;the one without the www2
         no-site-urls (map #(clojure.string/replace % site "") urls)
         options {:form-params {:cdn_id (:cdn_id config)
                                :login (:login config)
