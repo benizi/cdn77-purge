@@ -16,3 +16,6 @@ pom.xml.asc
 .hgignore
 .hg/
 *~
+*#
+*.log
+
