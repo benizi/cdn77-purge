@@ -1,10 +1,12 @@
 (ns cdn77purge.cdn77
-  (:require [org.httpkit.client :as http])
+  (:require [org.httpkit.client :as http]
+            )
   (:gen-class)
   )
 
 (use 'clojure.tools.logging)
 
+;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
 (defn cdn77-prefetch [urls config]
   (if (not= urls ())
     (let [site (:cdn config)              ;the one without the www2
@@ -18,6 +20,5 @@
           {:keys [status error]} res]
       (info site)
       (info no-site-urls)
-      (if error
-        (error "Failed, exception is " error res)
-        (info "Async HTTP POST: " status res)))))
+      (if error (error "Failed, exception is " error res)))))
+
