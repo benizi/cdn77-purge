@@ -159,8 +159,18 @@
   ;;([] (first-time-updates (take 50 (get-sitemap))))
   ([] (first-time-updates (get-sitemap)))
 
-  ([sitemap] (filter #(not (same-contents? %)) sitemap))
-  )
+  ([sitemap] 
+
+   ;; Which of the #(..%..) below is incorrect? Anyway (fn works
+   ;; (let [compare-result (map #({:url % :same (same-contents? %)}) (take 10 sitemap))
+   ;;       filtered (filter #((not (:same %))) compare-result)
+   ;;       res (map #((:url %)) filtered)]
+
+   ;;; pfilter implemented using pmap, filter and map
+   (let [compare-result (pmap (fn [x] {:url x :same (same-contents? x)}) sitemap)
+         filtered (filter (fn [x] (not (:same x))) compare-result)
+         res (map (fn [x] (:url x)) filtered)]
+     res)))
 
 (def batch-size 20)
 
