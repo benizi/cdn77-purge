@@ -97,8 +97,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
 
+(defn remove-trailing-slash [url]
+  (if (.endsWith url "/")
+    (.substring url 0 (- (.length url) 1))
+    url))
+
 (defn remove-backslash-slash [url]
-  (clojure.string/replace url "\\/" "/"))
+  (-> url
+      (clojure.string/replace "\\/" "/")
+      ;; (remove-trailing-slash)
+      (str "?foo")
+      ))
 
 (defn get-sitemap []
   "Get the complete sitemap, parse it, and returns of the urls only"
