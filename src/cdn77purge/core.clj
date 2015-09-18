@@ -7,7 +7,7 @@
   (:gen-class)
   )
 
-
+(use 'clojure.tools.logging)
 
 (def Cdn77
   "The parameters used to identify your CDN77 account
@@ -88,25 +88,55 @@
 
 )
 
+;; I have to remove wordfence part of page, since it changes
+;; ('//www2.spreadsheetconverter.com/?wordfence_logHuman=1&hid=7F2B40C98954833D308AB4F06377819B');/*]]>*
+(defn remove-between [page start-text end-text]
+  (let [start (.indexOf page start-text)
+        end (.indexOf page end-text (+ start (.length start-text)))]
+    (if (or (< start 0)(< end 0))
+      page
+      (str (.substring page 0 start) (.substring page end)))))
+
+(defn keep-body [page]
+  (.substring page (.indexOf page "<body")))
+
+(defn remove-wordfence [page]
+  (-> page
+      (keep-body)
+      (remove-between "'//www2.spreadsheetconverter.com/?wordfence_logHuman" "');/*]]>*")
+      (remove-between "\"pjaxcontainer" "\"")
+      (clojure.string/replace "gf_browser_chrome" "")
+      (clojure.string/replace "gf_browser_unknown" "")
+      (clojure.string/replace "gf_browser_gecko" "")
+      (clojure.string/replace "<section\nclass=\"ipad-head\"><div\nclass=\"container\"> <a\nhref=\"#\"><img\nsrc=\"/wp-content/themes/ssc/img/btn-close.png\" width=\"130\" height=\"38\" alt=\"\"></a> <img\nsrc=\"/wp-content/themes/ssc/img/img-ipad.png\" width=\"430\" height=\"100\" alt=\"\"></div> </section> " "")
+      ))
+
 (defn same-contents? [url]
   "Check same contents by downloading page"
-  (let [origin-contents (:body @(http/get (make-origin url)))
-        cdn-contents (:body @(http/get (make-cdn url)))]
-    (= origin-contents cdn-contents)))
+  (let [origin-contents-raw (:body @(http/get (make-origin url)))
+        cdn-contents-raw (:body @(http/get (make-cdn url)))
+        origin-contents (remove-wordfence origin-contents-raw)
+        cdn-contents (remove-wordfence cdn-contents-raw)]
+    (let [res (= origin-contents cdn-contents)]
+      (if (not res)
+        (do
+          (spit "origin.log" (prn-str origin-contents))
+          (spit "cdn.log" (prn-str cdn-contents))))
+      res)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
 
-(defn remove-trailing-slash [url]
-  (if (.endsWith url "/")
-    (.substring url 0 (- (.length url) 1))
-    url))
+;; (defn remove-trailing-slash [url]
+;;   (if (.endsWith url "/")
+;;     (.substring url 0 (- (.length url) 1))
+;;     url))
 
 (defn remove-backslash-slash [url]
   (-> url
       (clojure.string/replace "\\/" "/")
       ;; (remove-trailing-slash)
-      (str "?foo")
+      ;; (str "?foo")
       ))
 
 (defn get-sitemap []
