@@ -20,11 +20,6 @@
   "All pages I know about and there last-modified information"
   (atom ()))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Manage state
 
@@ -176,3 +171,11 @@
          rest (nthrest stale-urls batch-size)]
      (cdn77purge.cdn77/cdn77-prefetch first Cdn77)
      (recur rest))))
+
+(defn -main
+  "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
+  [& args]
+  (println "Starting...")
+  (force-refresh)
+)
+
