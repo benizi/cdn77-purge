@@ -16,12 +16,14 @@
   (read-string (slurp "/home/mattias/cdn77.config")))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Manage state 
+;;; (not used currently, we start from scratch everytime)
+
+(comment 
 (def State
   "All pages I know about and there last-modified information"
   (atom ()))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Manage state
 
 (defn update! [filename data]
   "data is the new data to associate with filename"
@@ -35,7 +37,7 @@
   "Load state from disk"
   (let [state (read-string (slurp "state.txt"))]
     (reset! State state)))
-
+)
 
 
 
@@ -167,10 +169,11 @@
   ([] (force-refresh (first-time-updates)))
 
   ([stale-urls]
-   (let [first (take batch-size stale-urls)
-         rest (nthrest stale-urls batch-size)]
-     (cdn77purge.cdn77/cdn77-prefetch first Cdn77)
-     (recur rest))))
+   (if (not= stale-urls ())
+     (let [first (take batch-size stale-urls)
+           rest (nthrest stale-urls batch-size)]
+       (cdn77purge.cdn77/cdn77-prefetch first Cdn77)
+       (recur rest)))))
 
 (defn -main
   "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
