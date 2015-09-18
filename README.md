@@ -2,9 +2,16 @@
 
 This is not working currently, since CDN77 prefetch-api cannot handle a url like /about-us/ as a page. It assumes it is a directory. I am waiting for a fix.
 
+There are other issues I hope CDN77 will fix
+ * forward the etag
+ * forward the last-modified
+so I do not have to compare page by contents, and just can do all this by using HEAD instead of GET.
+
 # cdn77purge
 
 Make sure CDN77 has the lastest files.
+
+This program should be run after an update of my web site content in Wordpress at my origin.
 
 I have a slightly different setup than most, since my complete site is hosted on the CDN.
 
