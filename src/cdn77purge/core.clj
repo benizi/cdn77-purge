@@ -9,11 +9,21 @@
 
 (use 'clojure.tools.logging)
 
+(defn find-and-slurp
+  "Search and slurp for file in this dir, and all parents until found. Throw exception if not found. Max 5 levels"
+  ([filename] (find-and-slurp filename 5 ""))
+  ([filename level prefix]
+   (if (< level 0) 
+     (throw (Exception. (str "Not found: " filename)))
+     (if (.exists (clojure.java.io/as-file (str prefix filename)))
+       (slurp (str prefix filename))
+       (recur filename (- level 1) (str "../" prefix))))))
+
 (def Cdn77
   "The parameters used to identify your CDN77 account
    https://client.cdn77.com/support/api/version/2.0/data#Prefetch"
   ;;(atom {:login "" :passwd "" :cdn_id "" :origin "" :cdn ""})
-  (read-string (slurp "/home/mattias/cdn77.config")))
+  (read-string (find-and-slurp "cdn77.config")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
