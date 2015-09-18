@@ -12,7 +12,7 @@
           options {:form-params {:cdn_id (:cdn_id config)
                                  :login (:login config)
                                  :passwd (:passwd config)
-                                 ;; todo: need to handle more urls
+                                 "purge_first" "1"
                                  "url[]" no-site-urls}}
           res @(http/post "https://api.cdn77.com/v2.0/data/prefetch" options)
           {:keys [status error]} res]
