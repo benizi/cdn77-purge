@@ -25,13 +25,15 @@ Clone, compile using "lein compile" and "lein repl" and run (force-refresh).
 
 You will need to create a cdn77.config files that looks like this and edit the path to it.
 
+```
 {:login "email"
  :passwd "cdn77key"
  :cdn_id "6534784"
  :origin "http://www2.spreadsheetconverter.com"
  :cdn "http://www.spreadsheetconverter.com"
  }	
-	 
+```
+
 ## Usage
 
 FIXME: explanation
