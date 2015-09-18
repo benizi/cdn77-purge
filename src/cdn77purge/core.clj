@@ -1,5 +1,5 @@
 (ns cdn77purge.core
-  (:require [org.httpkit.client :as http]
+  (:require [org.httpkit.client :as http] ; http://www.http-kit.org/client.html
   	    [clojure.data.xml :as xml]
 	    [clojure.java.io :as io]
             [cdn77purge.cdn77 :as cdn77]
