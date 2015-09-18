@@ -201,6 +201,7 @@
   [& args]
   (println "Starting...")
   (force-refresh)
+  (shutdown-agents)
   (println "...Finished")
 )
 
