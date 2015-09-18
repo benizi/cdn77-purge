@@ -129,6 +129,7 @@
 ;;     (.substring url 0 (- (.length url) 1))
 ;;     url))
 
+;;; todo: remove-backslash-slash should be completely unneccessary, remove it
 (defn remove-backslash-slash [url]
   (-> url
       (clojure.string/replace "\\/" "/")
@@ -161,7 +162,7 @@
   ([sitemap] (filter #(not (same-contents? %)) sitemap))
   )
 
-(def batch-size 5)
+(def batch-size 20)
 
 (defn force-refresh 
   "Ask cdn77 to refresh all urls. In order not to make the POST too big, the
@@ -180,5 +181,6 @@
   [& args]
   (println "Starting...")
   (force-refresh)
+  (println "...Finished")
 )
 
