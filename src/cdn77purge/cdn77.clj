@@ -7,7 +7,7 @@
 (use 'clojure.tools.logging)
 
 ;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
-(defn cdn77-prefetch [urls config]
+(defn cdn77-prefetch [config urls]
   (if (not= urls ())
     (let [;;the one without the www2
           site (:cdn config)              

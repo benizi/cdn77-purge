@@ -193,7 +193,7 @@
    (if (not= stale-urls ())
      (let [first (take batch-size stale-urls)
            rest (nthrest stale-urls batch-size)]
-       (cdn77purge.cdn77/cdn77-prefetch first Cdn77)
+       (cdn77purge.cdn77/cdn77-prefetch Cdn77 first)
        (recur rest)))))
 
 (defn -main
