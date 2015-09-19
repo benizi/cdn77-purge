@@ -199,7 +199,7 @@
 (defn -main
   "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
   [& args]
-  (println "Starting...")
+  (println "Starting..." (:cdn Cdn77))
   (force-refresh)
   (shutdown-agents)
   (println "...Finished")
