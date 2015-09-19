@@ -36,9 +36,9 @@ You will need to create a cdn77.config files that looks like this and place it i
 
 ## Usage
 
-FIXME: explanation
+    $ java -jar cdn77purge-0.1.0-standalone.jar
 
-    $ java -jar cdn77purge-0.1.0-standalone.jar [args]
+and when ...Finished is shown, all urls that were different are listed.
 
 ## Options
 
