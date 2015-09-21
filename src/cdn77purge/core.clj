@@ -3,10 +3,12 @@
   	    [clojure.data.xml :as xml]
 	    [clojure.java.io :as io]
             [cdn77purge.cdn77 :as cdn77]
+            [diff-match-patch-clj.core :as dmp]
             )
   (:gen-class)
   )
 
+(use 'diff-match-patch-clj.core)
 (use 'clojure.tools.logging)
 
 (defn find-and-slurp
