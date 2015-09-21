@@ -13,6 +13,9 @@
                  ;; user=> (require '[clojure.tools.namespace.repl :refer [refresh]])
                  ;; user=> (refresh)
                  [org.clojure/tools.namespace "0.2.11"]
+                 ;; https://github.com/scusack/diff-match-patch-clj
+                 [diff-match-patch-clj "1.0.0-SNAPSHOT"]
+                 
                  ]
   :main ^:skip-aot cdn77purge.core
   :target-path "target/%s"

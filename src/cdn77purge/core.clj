@@ -127,8 +127,23 @@
     (let [res (= origin-contents cdn-contents)]
       (if (not res)
         (do
+          (println)
+          (println "*************************************************")
+          (println url)
+          (doseq [one-diff
+                  ;; only keep :ins and :del and diffs of more than 5 chars
+                  (filter (fn [x] (and (not= (first x) :span) (> (count (nth x 2)) 5)))
+                          (-> (diff origin-contents cdn-contents) cleanup! as-hiccup))]
+            (let [op (nth one-diff 0)
+                  data (nth one-diff 2)]
+              (cond
+                (= :ins op) (println "CDN: " data)
+                (= :del op) (println " WP: " data)
+                :else       (println "???: " one-diff))))
+          (println "******")
           (spit "origin.log" (prn-str origin-contents))
-          (spit "cdn.log" (prn-str cdn-contents))))
+          (spit "cdn.log" (prn-str cdn-contents))
+          ))
       res)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
