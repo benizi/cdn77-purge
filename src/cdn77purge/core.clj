@@ -4,6 +4,7 @@
 	    [clojure.java.io :as io]
             [cdn77purge.cdn77 :as cdn77]
             [diff-match-patch-clj.core :as dmp]
+            [clojure.tools.cli :refer [parse-opts]]
             )
   (:gen-class)
   )
@@ -213,12 +214,30 @@
        (cdn77purge.cdn77/cdn77-prefetch Cdn77 first)
        (recur rest)))))
 
+;;; https://github.com/clojure/tools.cli
+(def cli-options
+  ;; An option with a required argument
+  [["-a" "--all" "Purge the cache, incl cached .msi files"
+    :id :all
+    :default 0]
+   ;; A non-idempotent option
+   ["-v" nil "Verbosity level"
+    :id :verbosity
+    :default 0
+    :assoc-fn (fn [m k _] (update-in m [k] inc))]
+   ;; A boolean option defaulting to nil
+   ["-h" "--help"]])
+
 (defn -main
   "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
   [& args]
-  (println "Starting..." (:cdn Cdn77))
-  (force-refresh)
-  (shutdown-agents)
-  (println "...Finished")
-)
+  (let [options (:options (parse-opts args cli-options))]
+    (println "Starting..." (:cdn Cdn77) (prn-str options))
+    (if (:all options)
+      (cdn77purge.cdn77/cdn77-purgeall Cdn77)
+      (force-refresh))
+    (shutdown-agents)
+    (println "...Finished")
+    ))
+
 
