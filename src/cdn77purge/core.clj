@@ -219,7 +219,7 @@
   ;; An option with a required argument
   [["-a" "--all" "Purge the cache, incl cached .msi files"
     :id :all
-    :default 0]
+    :default nil]
    ;; A non-idempotent option
    ["-v" nil "Verbosity level"
     :id :verbosity
