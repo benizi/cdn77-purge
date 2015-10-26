@@ -1,13 +1,14 @@
 (ns cdn77purge.cdn77
   (:require [org.httpkit.client :as http]
+            [mw.mwm :as mwm]
+            [mw.mw1 :as mw1]
             )
   (:gen-class)
   )
 
 (use 'clojure.tools.logging)
 
-;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
-(defn cdn77-prefetch [config urls]
+(defn cdn77-urls [url msg config urls]
   (if (not= urls ())
     (let [;;the one without the www2
           site (:cdn config)              
@@ -16,14 +17,24 @@
           options {:form-params {:cdn_id (:cdn_id config)
                                  :login (:login config)
                                  :passwd (:passwd config)
-                                 ;;purge_first makes cdn77 replace it's current cache
-                                 "purge_first" "1"
                                  "url[]" no-site-urls}}
-          res @(http/post "https://api.cdn77.com/v2.0/data/prefetch" options)
+          res @(http/post url options)
           {:keys [status error]} res]
-      (info "prefetched " no-site-urls)
+      (println (str msg no-site-urls))
       (if error (error "Failed, exception is " error res)))))
 
+;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
+(mwm/defn2 cdn77-prefetch [config urls]
+  (cdn77-urls "https://api.cdn77.com/v2.0/data/prefetch"
+              "prefetched "
+              config urls))
+
+;;; https://client.cdn77.com/support/api/version/2.0/data#Purge
+;;; https://api.cdn77.com/v2.0/data/purge
+(mwm/defn2 cdn77-purge [config urls]
+  (cdn77-urls "https://api.cdn77.com/v2.0/data/purge"
+              "purged "
+              config urls))
 
 
 (defn cdn77-purgeall [config]
