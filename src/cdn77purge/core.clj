@@ -14,21 +14,12 @@
 (use 'diff-match-patch-clj.core)
 (use 'clojure.tools.logging)
 
-(mwm/defn2 find-and-slurp
-  "Search and slurp for file in this dir, and all parents until found. Throw exception if not found. Max 5 levels"
-  ([filename] (find-and-slurp filename 5 ""))
-  ([filename level prefix]
-   (if (< level 0) 
-     (throw (Exception. (str "Not found: " filename)))
-     (if (.exists (clojure.java.io/as-file (str prefix filename)))
-       (slurp (str prefix filename))
-       (recur filename (- level 1) (str "../" prefix))))))
 
 (def Cdn77
   "The parameters used to identify your CDN77 account
    https://client.cdn77.com/support/api/version/2.0/data#Prefetch"
   ;;(atom {:login "" :passwd "" :cdn_id "" :origin "" :cdn ""})
-  (read-string (find-and-slurp "cdn77.config")))
+  (read-string (mw1/find-and-slurp "cdn77.config")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -246,7 +237,7 @@
   "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
   [& args]
   (let [options (:options (parse-opts args cli-options))]
-    (println "Starting..." (:cdn Cdn77) (prn-str options))
+    (println "Starting..." (:cdn Cdn77) (prn-str options) (.getParent (java.io.File. (mw1/this-jar? mw.mw1))))
     (if (:all options)
       (cdn77purge.cdn77/cdn77-purgeall Cdn77)
       (force-refresh))
