@@ -20,7 +20,7 @@
                                  "url[]" no-site-urls}}
           res @(http/post url options)
           {:keys [status error]} res]
-      (println (str msg no-site-urls))
+      (println (str msg (vec no-site-urls)))
       (if error (error "Failed, exception is " error res)))))
 
 ;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
@@ -35,7 +35,6 @@
   (cdn77-urls "https://api.cdn77.com/v2.0/data/purge"
               "purged "
               config urls))
-
 
 (defn cdn77-purgeall [config]
   (let [options {:form-params {:cdn_id (:cdn_id config)

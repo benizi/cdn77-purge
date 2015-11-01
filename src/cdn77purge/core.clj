@@ -204,18 +204,29 @@
 
 (def batch-size 20)
 
-(mwm/defn2 force-refresh 
-  "Ask cdn77 to refresh all urls. In order not to make the POST too big, the
-  number of urls per request is limited to batch-size"
-  ([] (force-refresh (first-time-updates)))
+(mwm/defn2 cdn-apply
+  "Ask cdn77 to apply a command like purge or prefetch.
+  In order not to make the POST too big, 
+  the number of urls per request is limited to batch-size"
+  ([f stale-urls]
+   (loop [stale-urls stale-urls]
+     (if (not= stale-urls ())
+       (let [first (take batch-size stale-urls)
+             rest (nthrest stale-urls batch-size)]
+         (f Cdn77 first)
+         (recur rest))))))
 
-  ([stale-urls]
-   (if (not= stale-urls ())
-     (let [first (take batch-size stale-urls)
-           rest (nthrest stale-urls batch-size)]
-       (cdn77purge.cdn77/cdn77-purge Cdn77 first)
-       (cdn77purge.cdn77/cdn77-prefetch Cdn77 first)
-       (recur rest)))))
+(mwm/defn2 force-refresh 
+  "Ask cdn77 to refresh all urls."
+  ([]
+   (let [stale-urls (first-time-updates)]
+     (cdn-apply cdn77purge.cdn77/cdn77-purge stale-urls)
+     ;; purge and prefetch are two separate queues at CDN77, so in order
+     ;; to make sure purge and prefetch are done in the correct order, let us
+     ;; wait a little
+     (Thread/sleep 5000)
+     (cdn-apply cdn77purge.cdn77/cdn77-prefetch stale-urls))))
+   
 
 ;;; https://github.com/clojure/tools.cli
 (def cli-options
