@@ -22,3 +22,7 @@ pom.xml.asc
 /cdn77.config
 /cdn77purge-distribution
 /.idea
+cdn77purge.iml
+page.txt
+state.txt
+cdn77purge-distribution.zip

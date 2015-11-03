@@ -1,0 +1,5 @@
+Please, if you use any script for prefetching using our API, check it and potentially remove the "purge first" parameter from your prefetch API calls, as they will now return "false" if this parameter is used.
+
+If you want to prefetch an updated file, that is already cached on our servers from before, please run a separate purge request for this file first now, and then prefetch it.
+
+todo: add logging, so that we can see if it cron works properly

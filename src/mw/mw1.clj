@@ -5,13 +5,12 @@
    [clojure.xml :as c-xml]
    [clojure.data.xml :as xml]
    [clojure.java.io :as io]
-;;   [clojure.tools.cli :refer [parse-opts]]
+   ;;   [clojure.tools.cli :refer [parse-opts]]
+   [clojure.pprint :as pp]
+   [clojure.walk :as walk]
    )
   (:gen-class)
   )
-
-(require '[clojure.pprint :as pp]
-         '[clojure.walk :as walk])
 
 ;; (use 'clojure.tools.logging)
 

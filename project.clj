@@ -1,6 +1,6 @@
 ;;; TIP: lein ancient to find updates
 
-(defproject cdn77purge "0.6.0"
+(defproject cdn77purge "0.6.1"
   :description "Loop over all pages on your site and prefetch the changed ones"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
