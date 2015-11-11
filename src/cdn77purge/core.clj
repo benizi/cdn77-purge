@@ -31,15 +31,15 @@
   "All pages I know about and there last-modified information"
   (atom ()))
 
-(mwm/defn2 update! [filename data]
+(mwm/defn update! [filename data]
   "data is the new data to associate with filename"
   (swap! State (fn [state] (assoc state filename data))))
 
-(mwm/defn2 save-state []
+(mwm/defn save-state []
   "Save state to disk"
   (spit "state.txt" (prn-str @State)))
 
-(mwm/defn2 load-state []
+(mwm/defn load-state []
   "Load state from disk"
   (let [state (read-string (slurp "state.txt"))]
     (reset! State state)))
@@ -53,13 +53,13 @@
 ;;; In my case, switching between origin and master url is
 ;;; very simple
 
-(mwm/defn2 make-origin [url] 
+(mwm/defn make-origin [url]
   "Make sure www is replaced by www2, unless we already have it"
   (if (.contains url "://www.")
     (clojure.string/replace url "://www." "://www2.")
     url))
 
-(mwm/defn2 make-cdn [url] 
+(mwm/defn make-cdn [url]
   "Make sure www2 is replaced by www, unless we already have it"
   (if (.contains url "://www2.")
     (clojure.string/replace url "://www2." "://www.")
@@ -71,19 +71,19 @@
 ;;; we could have used etag too, but that is not supported by CDN77
 ;;; (20150917)
 
-(mwm/defn2 get-last-modified-origin [url]
+(mwm/defn get-last-modified-origin [url]
   "Get the date from the origin"
   (let [headers (http/head (make-origin url))
         modified (-> @headers :headers :last-modified)]
     (list url modified)))
 
-(mwm/defn2 get-last-modified-cdn [url]
+(mwm/defn get-last-modified-cdn [url]
   "Get the date from the origin"
   (let [headers (http/head (make-cdn url))
         modified (-> @headers :headers :last-modified)]
     (list url modified)))
 
-(mwm/defn2 same-contents? [url]
+(mwm/defn same-contents? [url]
   "return true of both CDN and origin has the same contents"
   (let [origin-last-modified (get-last-modified-origin url)
         cdn-last-modified (get-last-modified-cdn url)]
@@ -93,17 +93,17 @@
 
 ;; I have to remove wordfence part of page, since it changes
 ;; ('//www2.spreadsheetconverter.com/?wordfence_logHuman=1&hid=7F2B40C98954833D308AB4F06377819B');/*]]>*
-(mwm/defn2 remove-between [page start-text end-text]
+(mwm/defn remove-between [page start-text end-text]
   (let [start (.indexOf page start-text)
         end (.indexOf page end-text (+ start (.length start-text)))]
     (if (or (< start 0)(< end 0))
       page
       (str (.substring page 0 start) (.substring page end)))))
 
-(mwm/defn2 keep-body [page]
+(mwm/defn keep-body [page]
   (.substring page (.indexOf page "<body")))
 
-(mwm/defn2 remove-wordfence [page]
+(mwm/defn remove-wordfence [page]
   (-> page
       (keep-body)
       (remove-between "'//www2.spreadsheetconverter.com/?wordfence_logHuman" "');/*]]>*")
@@ -114,7 +114,7 @@
       (clojure.string/replace "<section\nclass=\"ipad-head\"><div\nclass=\"container\"> <a\nhref=\"#\"><img\nsrc=\"/wp-content/themes/ssc/img/btn-close.png\" width=\"130\" height=\"38\" alt=\"\"></a> <img\nsrc=\"/wp-content/themes/ssc/img/img-ipad.png\" width=\"430\" height=\"100\" alt=\"\"></div> </section> " "")
       ))
 
-(mwm/defn2 same-contents? [url]
+(mwm/defn same-contents? [url]
   "Check same contents by downloading page"
   (let [origin-contents-raw (:body @(http/get (make-origin url)))
         cdn-contents-raw (:body @(http/get (make-cdn url)))
@@ -145,20 +145,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Read sitemap.xml as XML and extract all loc:s
 
-;; (mwm/defn2 remove-trailing-slash [url]
+;; (mwm/defn remove-trailing-slash [url]
 ;;   (if (.endsWith url "/")
 ;;     (.substring url 0 (- (.length url) 1))
 ;;     url))
 
 ;;; todo: remove-backslash-slash should be completely unneccessary, remove it
-(mwm/defn2 remove-backslash-slash [url]
+(mwm/defn remove-backslash-slash [url]
   (-> url
       (clojure.string/replace "\\/" "/")
       ;; (remove-trailing-slash)
       ;; (str "?foo")
       ))
 
-(mwm/defn2 get-sitemap []
+(mwm/defn get-sitemap []
   "Get the complete sitemap, parse it, and returns of the urls only"
   (let [sitemap-url (str (:origin Cdn77) "/sitemap.xml")
         sitemap-page (http/get sitemap-url)
@@ -175,7 +175,7 @@
 ;;; first time, when do not have a state, we need to download all
 ;;; files from both origin and cdn. Once we have a state, we only download
 ;;; from origin and compare, and then force a refresh of cdn
-(mwm/defn2 first-time-updates 
+(mwm/defn first-time-updates
   "find all urls whose are not the same in origin and cdn"
   ;;([] (first-time-updates (take 50 (get-sitemap))))
   ([] (first-time-updates (get-sitemap)))
@@ -195,7 +195,7 @@
 
 (def batch-size 20)
 
-(mwm/defn2 cdn-apply
+(mwm/defn cdn-apply
   "Ask cdn77 to apply a command like purge or prefetch.
   In order not to make the POST too big, 
   the number of urls per request is limited to batch-size"
@@ -207,7 +207,7 @@
          (f Cdn77 first)
          (recur rest))))))
 
-(mwm/defn2 force-refresh 
+(mwm/defn force-refresh
   "Ask cdn77 to refresh all urls."
   ([]
    (let [stale-urls (first-time-updates)]

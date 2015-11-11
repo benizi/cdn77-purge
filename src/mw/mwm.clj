@@ -62,18 +62,18 @@
 ;; (mwm/defn2 foo? "can return nil" ([x] (:foo (:bar x))) ([y z] (:gegga y)))
 
 ;;; true if (:keyword ??)
-(defn- is-keyword-get? [x]
+(clojure.core/defn- is-keyword-get? [x]
   (and (list? x)
        (= 2 (count x))
        (keyword? (first x))))
 
-(defn- is-keyword-get-get? [x]
+(clojure.core/defn- is-keyword-get-get? [x]
   (and (list? x)
        (= 3 (count x))
        (= 'clojure.core/get (first x))
        (keyword? (last x))))
 
-(defn- is-let? [x]
+(clojure.core/defn- is-let? [x]
   (and (list? x)
        (< 2 (count x))
        (= 'clojure.core/let (first x))))
@@ -82,7 +82,7 @@
 
 ;;; wrap all (:xxx yyy) calls and make sure result is non-nil
 ;;; this must be called using postwalk, since (:ccc ???) is in the result, and then I would expand that again
-(defn- wrap-get-2 [x]
+(clojure.core/defn- wrap-get-2 [x]
   (if (is-keyword-get? x)
     (let [keyword1 (first x)
           ;; (str) better than (name) + (name-space), but need to remove ':'
@@ -99,7 +99,7 @@
     x))
 
 ;;; (get map :foo) => (:foo map)
-(defn- remove-get-3 [x]
+(clojure.core/defn- remove-get-3 [x]
   (if (is-keyword-get-get? x)
     (list (last x) (second x))
     x))
@@ -107,24 +107,24 @@
 
 
 ;;; return true if names ends with ?
-(defn- q? [name]
+(clojure.core/defn- q? [name]
   ;; (str) in case we get a keyword
   (= \? (last (str name))))
 
 ;;; ignore this argument
-(defn- ignore-arg? [name]
+(clojure.core/defn- ignore-arg? [name]
   (or (q? name) (keyword? name) (= "&" (str name))))
 
 
 ;;; return true of body contains recur
 ;;; if recur exists, we will skip the :post
-(defn- recur? [fun]
+(clojure.core/defn- recur? [fun]
   (some #(and (seq? %)(= 'recur (first %)))
         (tree-seq seq? rest fun)))
 
 ;;; add :post unless allowed-to-return-nil
 ;;; add :pre for each argument whose name not ending with ?
-(defn- build-pre-post [args no-post]
+(clojure.core/defn- build-pre-post [args no-post]
   (let [pre (into [] (for [arg (filter (complement ignore-arg?) args)] `(not (nil? ~arg))))
         pre2 (if (> (count pre) 0) {:pre pre} {})
         post (if no-post {} {:post [#(not (nil? %))]})
@@ -133,7 +133,7 @@
 
 
 ;;; add {:pre :post} map unless prepost-map already exists
-(defn- add-pre-post [clause no-post]
+(clojure.core/defn- add-pre-post [clause no-post]
   (let [args (first clause)
         prepost (map? (second clause))
         rst (nthrest clause 1)]
@@ -147,7 +147,7 @@
 ;;; argument names ending with ? and function names ending with ? can be nil
 ;;;
 ;;; comment disappears when macroexpanding, but (doc XXX) works
-(defmacro defn2 [& body]
+(defmacro mw.mwm/defn [& body]
   ;; expand first in order to make all bodies look the same, regardless of one or more clauses
   ;; macroexpand instead of macroexpand-1 since we want to handle :keys
   (let [defun (macroexpand-1 (cons 'clojure.core/defn body))

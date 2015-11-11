@@ -14,7 +14,7 @@
 
 ;; (use 'clojure.tools.logging)
 
-(mwm/defn2 this-jar?
+(mwm/defn this-jar?
   "utility function to get the name of jar in which this function is invoked
   Used like this: (println (this-jar mw.mw1))"
   [& [ns]]
@@ -23,7 +23,7 @@
         .getProtectionDomain .getCodeSource .getLocation .getPath)
     (catch Exception e nil)))
 
-(mwm/defn2 find-and-slurp-internal
+(mwm/defn find-and-slurp-internal
   "Search and slurp for file in this dir, and all parents until found. Throw exception if not found. Max 50 levels"
   ([filename] (find-and-slurp-internal filename 50 ""))
   ([filename level prefix]
@@ -37,7 +37,7 @@
 
 ;;; Look at http://www.mkyong.com/java/java-cron-job-to-run-a-jar-file/
 ;;; to see how jar file can be scheduled easily
-(mwm/defn2 find-and-slurp
+(mwm/defn find-and-slurp
   "Search in this dir, and if not found, search in position of jar file (for cron) or any of its parents"
   [filename]
   (try
@@ -49,7 +49,7 @@
           (throw (Exception. (str "Not found: " filename))))))))
 
 
-(mwm/defn2 of-xml-string
+(mwm/defn of-xml-string
   "Convert a UTF-8 string into an clojure structure"
   [str]
   (xml/parse (java.io.ByteArrayInputStream. (.getBytes str "UTF-8"))))
@@ -57,7 +57,7 @@
 ;; (def x1 (mw1/of-xml-string (:body @(http/get (:url Config)))))
 ;; (xml-keep-tag-content x1)
 
-(mwm/defn2 xml-keep-tag-content
+(mwm/defn xml-keep-tag-content
   "Keep recursive map and only keep :tag and :content as key and value.
    The resulting structure looks like json."
   ([pxml]
