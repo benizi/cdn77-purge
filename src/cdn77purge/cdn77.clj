@@ -24,14 +24,14 @@
       (if error (error "Failed, exception is " error res)))))
 
 ;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
-(mwm/defn2 cdn77-prefetch [config urls]
+(mwm/defn cdn77-prefetch [config urls]
   (cdn77-urls "https://api.cdn77.com/v2.0/data/prefetch"
               "prefetched "
               config urls))
 
 ;;; https://client.cdn77.com/support/api/version/2.0/data#Purge
 ;;; https://api.cdn77.com/v2.0/data/purge
-(mwm/defn2 cdn77-purge [config urls]
+(mwm/defn cdn77-purge [config urls]
   (cdn77-urls "https://api.cdn77.com/v2.0/data/purge"
               "purged "
               config urls))
