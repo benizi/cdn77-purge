@@ -1,6 +1,6 @@
 ;;; TIP: lein ancient to find updates
 
-(defproject cdn77purge "0.6.2"
+(defproject cdn77purge "0.6.3"
   :description "Loop over all pages on your site and prefetch the changed ones"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -18,6 +18,7 @@
                  [org.clojure/tools.cli "0.3.3"]
                  ]
   :main ^:skip-aot cdn77purge.core
+  :aot [mw.mw1 mw.mwm]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   )
