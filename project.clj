@@ -16,8 +16,15 @@
                  ;; https://github.com/scusack/diff-match-patch-clj
                  [diff-match-patch-clj "1.0.0-SNAPSHOT"]
                  [org.clojure/tools.cli "0.3.3"]
+                 ;; http://stackoverflow.com/questions/25145487/local-dependencies-in-leiningen-without-creating-a-maven-repo
+                 [mw1 "0.7.0"]
                  ]
+  :resource-paths [
+                   ;; just copy the jar-file from the mw1/target/uberjar+uberjar/
+                   ;; "resources/mw1-0.7.0.jar"
+                   ]
   :main ^:skip-aot cdn77purge.core
+  :aot [mw.mw1 mw.mwm]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   )
