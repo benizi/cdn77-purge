@@ -1,7 +1,8 @@
 (ns cdn77purge.cdn77
+  (:use [mw.mwm :as mwm]
+        [mw.mw1 :as mw1]
+        )
   (:require [org.httpkit.client :as http]
-            [mw.mwm :as mwm]
-            [mw.mw1 :as mw1]
             )
   (:gen-class)
   )

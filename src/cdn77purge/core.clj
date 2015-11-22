@@ -1,12 +1,13 @@
 (ns cdn77purge.core
+  (:use [mw.mwm :as mwm]
+        [mw.mw1 :as mw1]
+        )
   (:require [org.httpkit.client :as http] ; http://www.http-kit.org/client.html
   	    [clojure.data.xml :as xml]
 	    [clojure.java.io :as io]
             [cdn77purge.cdn77 :as cdn77]
             [diff-match-patch-clj.core :as dmp]
             [clojure.tools.cli :refer [parse-opts]]
-            [mw.mwm :as mwm]
-            [mw.mw1 :as mw1]
             )
   (:gen-class)
   )
@@ -235,10 +236,10 @@
 
 (defn -main
   "Find all files that differ in the between my origin site and the CDN, and request a prefetch for those"
-  [& args]
-  (let [options (:options (parse-opts args cli-options))]
+  [& args?]
+  (let [options (:options (parse-opts args? cli-options))]
     (println "Starting..." (:cdn Cdn77) (prn-str options) (.getParent (java.io.File. (mw1/this-jar? mw.mw1))))
-    (if (:all options)
+    (if (:all? options)
       (cdn77purge.cdn77/cdn77-purgeall Cdn77)
       (force-refresh))
     (shutdown-agents)
