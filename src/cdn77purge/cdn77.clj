@@ -20,9 +20,9 @@
                                  :passwd (:passwd config)
                                  "url[]" no-site-urls}}
           res @(http/post url options)
-          {:keys [status error]} res]
+          {:keys [status? error?]} res]
       (println (str msg (vec no-site-urls)))
-      (if error (error "Failed, exception is " error res)))))
+      (if error? (error? "Failed, exception is " error? res)))))
 
 ;;; https://client.cdn77.com/support/api/version/2.0/data#Prefetch
 (mwm/defn cdn77-prefetch [config urls]
