@@ -3,6 +3,7 @@
    [clojure.pprint :as pp]
    [clojure.walk :as walk]
    )
+  (:refer-clojure :exclude [defn])
   (:gen-class)
   )
 
